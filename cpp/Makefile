@@ -15,7 +15,9 @@ BLD=bin
 
 CXX=g++
 
-# SOURCES=$(wildcard $(SRC)/*.cpp)
+SOURCES=$(wildcard $(SRC)/*.cpp)
+OBJS=$(notdir $(patsubst %cpp,%o,$(SOURCES)))
+BIN_OBJS=$(addprefix $(OBJ)/,$(OBJS))
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_10.html#SEC101
 # https://www.quora.com/What-does-o-cpp-in-a-Makefile-mean
 # https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
@@ -24,7 +26,7 @@ CXX=g++
 $(OBJ)/%.o: $(SRC)/%.cpp
 	$(CXX)  -c $< -o $@
 
-all: pre_check
+all: pre_check $(BIN_OBJS)
 
 pre_check:
 	@if ! test -f $(OBJ); then mkdir -p $(OBJ); fi
