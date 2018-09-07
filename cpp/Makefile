@@ -2,7 +2,7 @@
 MAJOR=0
 MINOR=1
 PATCH=0
-VERSION=$(MAJOR).$(MINOR).$(PATCH)
+VERSION=$(MAJOR).$(MINOR).$(PATCH)
 
 BIN=$(notdir $(CURDIR))
 DBG=$(BIN)g
@@ -12,6 +12,8 @@ INC=inc
 OBJ=obj/bin
 DBJ=obj/dbg
 BLD=bin
+LIB=lib
+
 
 CXX=g++
 
@@ -26,8 +28,17 @@ BIN_OBJS=$(addprefix $(OBJ)/,$(OBJS))
 $(OBJ)/%.o: $(SRC)/%.cpp
 	$(CXX)  -c $< -o $@
 
-all: pre_check $(BIN_OBJS)
+.PHONY: clean
+
+all: pre_check $(BIN_OBJS) $(BLD)/$(BIN)
+
+$(BLD)/$(BIN): $(BIN_OBJS)
+	$(CXX) -o $(BLD)/$(BIN) $(BIN_OBJS)
 
 pre_check:
 	@if ! test -f $(OBJ); then mkdir -p $(OBJ); fi
 	@if ! test -f $(DBJ); then mkdir -p $(DBJ); fi
+	@if ! test -f $(BLD); then mkdir -p $(BLD); fi
+
+clean:
+	rm -f $(BIN_OBJS) $(BLD)/* core
