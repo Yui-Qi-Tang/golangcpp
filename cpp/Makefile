@@ -16,6 +16,8 @@ LIB=lib
 
 
 CXX=g++
+CXXFLAGS= -std=c++11
+
 
 SOURCES=$(wildcard $(SRC)/*.cpp)
 OBJS=$(notdir $(patsubst %cpp,%o,$(SOURCES)))
@@ -26,7 +28,7 @@ BIN_OBJS=$(addprefix $(OBJ)/,$(OBJS))
 
 # 這裡下make沒反應
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(CXX)  -c $< -o $@
+	$(CXX) $(CXXFLAGS)  -c $< -o $@
 
 .PHONY: clean
 
