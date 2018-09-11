@@ -1,0 +1,60 @@
+# common ignores for git
+
+# Cordova dirs
+hooks/
+platforms/
+plugins/
+
+# Thumbs.db
+Thumbs.db
+
+# C/C++ object files
+*.o
+*.obj
+
+# C/C++ Precompiled Headers
+*.gch
+*.pch
+
+# Java class file
+*.class
+
+# LaTeX files
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# LibreCad/OpensCad files
+*.gcode
+*.stl
+
+# node.js
+node_modules/
+
+# Python compiled file
+*.pyc
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# generic files
+*~
+*.lock
+*.out
+*.swp
+
+# .gitignore
+bin/
