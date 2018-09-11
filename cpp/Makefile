@@ -16,7 +16,7 @@ LIB=lib
 
 
 CXX=g++
-CXXFLAGS= -std=c++11
+CXXFLAGS= -std=c++11 -lpthread -pthread
 
 
 SOURCES=$(wildcard $(SRC)/*.cpp)
@@ -36,7 +36,7 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 all: pre_check $(BIN_OBJS) $(BLD)/$(BIN)
 
 $(BLD)/$(BIN): $(BIN_OBJS)
-	$(CXX) -o $(BLD)/$(BIN) $(BIN_OBJS)
+	$(CXX) $(CXXFLAGS) -o $(BLD)/$(BIN) $(BIN_OBJS)
 
 pre_check:
 	@if ! test -f $(OBJ); then mkdir -p $(OBJ); fi
