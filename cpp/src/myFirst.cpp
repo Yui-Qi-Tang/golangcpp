@@ -1,6 +1,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <thread>
+#include <string.h>
 
 int socket_listen(int port) {
     int fd_socket;
@@ -66,21 +67,41 @@ bool client_connect(char *ip, int port, int client_fd) {
 
 }
 
+bool client_send_msg(int client_fd, char *msg) {
+    int success = send(client_fd, msg, strlen(msg), 0);
+    if (success < 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 int main(int argc, char* argv[]) {
     int fd_server = -1;
-    int server_port = 9000;
+    int server_port = 9999;
     int client_fd = -1;
     bool isConnect = false;
     char *server_ip = "127.0.0.1";
-    fd_server = socket_listen(server_port);
-    if(fd_server < 0) {
-        printf("can not create server fd, fd code: %d\n", fd_server);
-    }
-    std::thread mThread( server_accpet, fd_server, server_port ); // add serever_accept to thread pool
+    // fd_server = socket_listen(server_port);
+    // if(fd_server < 0) {
+    //     printf("can not create server fd, fd code: %d\n", fd_server);
+    // }
+    // std::thread mThread( server_accpet, fd_server, server_port ); // add serever_accept to thread pool
+
+    // client
     client_fd = create_client_fd();
     isConnect = client_connect(server_ip, server_port, client_fd);
     if(isConnect) {
         printf( "Client connects to server has been successed!! \n");
     }
+    // send msg
+    if(client_send_msg(client_fd, "Hi, I am Yuki Tang")) {
+        printf("send success \n");
+    }
+    else {
+        printf("Send failed! \n");
+    }
+    
     return 0;    
 }
