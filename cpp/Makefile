@@ -14,6 +14,7 @@ DBJ=obj/dbg
 BLD=bin
 LIB=lib
 
+INCLUDES=-I. -I$(INC)
 
 CXX=g++
 CXXFLAGS= -std=c++11 -lpthread -pthread
@@ -29,7 +30,7 @@ BIN_OBJS=$(addprefix $(OBJ)/,$(OBJS))
 
 
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(CXX) $(CXXFLAGS)  -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY: clean
 

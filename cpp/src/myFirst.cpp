@@ -3,40 +3,8 @@
 #include <thread>
 #include <string.h>
 
-int socket_listen(int port) {
-    int fd_socket;
-    struct sockaddr_in server_addr;
+#include "SetServerSocket.h"
 
-    // 建立一個 NONBLOCK 的 STREAM (串流) socket
-    fd_socket = socket(AF_INET, SOCK_STREAM, 0);
-
-    // memset(&server_addr, 0, sizeof(server_addr));
-
-    // 設定預定的主機地址，通訊埠 (port)
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = htons(INADDR_ANY);
-    //server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    server_addr.sin_port = htons(port);
-
-    // 將 fd_socket 和伺服地址資訊 *綁定*
-    bind(fd_socket, (struct sockaddr *)&server_addr, sizeof(server_addr));
-
-    // 開始 *聆聽* (listen) 連線要求
-    listen(fd_socket, 10);
-
-    return fd_socket;
-} // socket_listen()
-
-void server_accpet(int fd_server, int server_port) {
-    int fd_guest = -1;
-    if(fd_server == -1) {
-        printf("Server failed!");
-        exit(0);
-    }
-    printf("server started at %s:%d ...\n", "127.0.0.1", server_port);
-    fd_guest = accept(fd_server, (struct sockaddr *)NULL, NULL);
-    printf("accept status %d\n", fd_guest);
-}
 
 int create_client_fd() {
 
@@ -78,16 +46,14 @@ bool client_send_msg(int client_fd, char *msg) {
 }
 
 int main(int argc, char* argv[]) {
-    int fd_server = -1;
     int server_port = 9999;
+    char *server_ip = "127.0.0.1";
+    
     int client_fd = -1;
     bool isConnect = false;
-    char *server_ip = "127.0.0.1";
-    // fd_server = socket_listen(server_port);
-    // if(fd_server < 0) {
-    //     printf("can not create server fd, fd code: %d\n", fd_server);
-    // }
-    // std::thread mThread( server_accpet, fd_server, server_port ); // add serever_accept to thread pool
+
+    SetServerSocket server(server_ip, server_port);
+    std::thread mThread(&SetServerSocket::start_server, &server);
 
     // client
     client_fd = create_client_fd();
