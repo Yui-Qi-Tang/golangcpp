@@ -118,11 +118,8 @@ void SetServerSocket::client_send_msg_test(char *msg){
     isConnect = client_connect(client_fd);
     if(isConnect) {
         printf( "Client connects to server has been successed!! \n");
+        client_send_msg(client_fd, msg);
     }
-    // send msg
-    if(client_send_msg(client_fd, msg)) {
-        printf("client send success \n");
-    }       
 }
 
 /* client send msg */
