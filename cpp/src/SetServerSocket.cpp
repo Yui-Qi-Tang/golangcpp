@@ -79,3 +79,59 @@ void SetServerSocket::showRecvMsg(int guest_fd) {
 		printf("recv failed!\n");
 	}
 }
+
+/* create client fd */
+int SetServerSocket::create_client_fd() {
+    int client_fd = -1;
+    client_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(client_fd < 0) {
+        printf("can not create client fd: %d\n", client_fd);
+        return  client_fd;
+    }
+    printf("client fd is: %d\n", client_fd);
+    return client_fd;
+}
+
+/* client socket connect wrapper, return connect status */
+bool SetServerSocket::client_connect(int client_fd) {
+    int isConnect = -1;
+    struct sockaddr_in client;
+    memset(&client, 0, sizeof(client)); // init client; windows env doesnot support this function
+    client.sin_family = AF_INET;
+    client.sin_addr.s_addr = inet_addr(_ip);
+    client.sin_port = htons(_port);
+
+    isConnect = connect(client_fd, (struct sockaddr *)&client, sizeof(client));
+    if(isConnect < 0) {
+        return false;
+    }
+    return true;
+
+}
+
+/* client connect test */
+void SetServerSocket::client_send_msg_test(char *msg){
+    // client
+    bool isConnect = false;
+    int client_fd = -1;
+    client_fd = create_client_fd();
+    isConnect = client_connect(client_fd);
+    if(isConnect) {
+        printf( "Client connects to server has been successed!! \n");
+    }
+    // send msg
+    if(client_send_msg(client_fd, msg)) {
+        printf("client send success \n");
+    }       
+}
+
+/* client send msg */
+bool SetServerSocket::client_send_msg(int client_fd, char *msg) {
+    int success = send(client_fd, msg, strlen(msg), 0);
+    if (success < 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
