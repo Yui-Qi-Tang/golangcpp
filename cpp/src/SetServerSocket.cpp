@@ -8,7 +8,7 @@ SetServerSocket::SetServerSocket(char *ip, int port) {
 
 /* 解構子*/
 SetServerSocket::~SetServerSocket() {
-    delete _ip;
+    // delete _ip;
 }
 
 /* 開啟socket server */
