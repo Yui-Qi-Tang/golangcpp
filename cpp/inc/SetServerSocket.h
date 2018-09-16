@@ -22,6 +22,8 @@ class SetServerSocket {
         int create_client_fd();
         bool client_connect(int client_fd);
         bool client_send_msg(int client_fd, char *msg);
+        
+        bool server_send_msg(int guest_fd, char *msg);
 
     private:
         char *_ip;

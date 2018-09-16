@@ -25,6 +25,18 @@ void SetServerSocket::start_server() {
         printf("New guest!!\n");
 
         showRecvMsg(new_fd);
+        printf("Respone for client");
+        char *clientMsg = "client exit1";
+        if(
+            write(new_fd, clientMsg, strlen(clientMsg)) < 0 
+        )
+        {
+            printf("send failed");
+        }
+        else {
+            printf("send ok");
+        }
+        // close(new_fd);
 
     }
 
@@ -73,7 +85,7 @@ void SetServerSocket::showRecvMsg(int guest_fd) {
 	char buf[MAX_MSG_BUF_SIZE];
 	int has_new_msg = recv(guest_fd, buf, sizeof(buf), 0);
 	if (has_new_msg > 0) {
-		printf("Server get guest msg: %s\n", buf);
+		printf("Server get guest %d msg: %s\n", guest_fd, buf);
 	}
 	else {
 		printf("recv failed!\n");
@@ -125,6 +137,17 @@ void SetServerSocket::client_send_msg_test(char *msg){
 /* client send msg */
 bool SetServerSocket::client_send_msg(int client_fd, char *msg) {
     int success = send(client_fd, msg, strlen(msg), 0);
+    if (success < 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+/* server send msg to client */
+bool SetServerSocket::server_send_msg(int guest_fd, char *msg) {
+    int success = send(guest_fd, msg, strlen(msg), 0);
     if (success < 0) {
         return false;
     }
