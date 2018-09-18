@@ -17,30 +17,32 @@ void SetServerSocket::start_server() {
     printf("Server starting...\n");
     while(0x1) {
         int new_fd = -1;
-        printf("Waitting for new client...\n");
+        printf("===>Waitting for new client...\n");
         new_fd = new_guest_fd(server_fd);
         if(new_fd < 0){
 			printf("accept new guest failed!!\n");
 			continue;
 		}
         printf("New guest, the fd is: * %d *!!\n", new_fd);
-        process_msg(new_fd, get_client_msg(new_fd));
+
         /*
-        printf("get cmd from client: %s\n", client_cmd);
-        printf("Respone for client...");
-        char *clientMsg = "client exit1";
-        if(
-            write(new_fd, clientMsg, strlen(clientMsg)) < 0 
-        )
-        {
-            printf("send failed\n");
-        }
-        else {
-            printf("server sends ok\n");
+        const char *STOP = "stop";
+        const char *guest_str = get_client_msg(new_fd);
+        printf("guest say: %s\n", guest_str);
+        if(strcmp(guest_str, STOP) == 0){
+          close(new_fd);
         }
         */
-        //close(new_fd);
 
+        
+        process_msg(new_fd, get_client_msg(new_fd));
+        printf("Wait client close!!\n");
+        if(get_client_msg(new_fd) == "end"){ // enter to recv loop again
+           close_guest_fd(new_fd);
+        }
+        //for(int i = 0; i < 4; i++){
+        //    printf("%d: recv str %s\n",i , get_client_msg(new_fd));
+        //}
     }
 
 }
@@ -175,6 +177,12 @@ const char* SetServerSocket::get_client_msg(int guest_fd) {
     const char *ptr = buf;
     memset(buf, 0, sizeof(buf)); // init client; windows env doesnot support this function
 	int has_new_msg = recv(guest_fd, buf, sizeof(buf), 0);
+
+    //printf("revc: %d\n", has_new_msg);
+    if(has_new_msg <= 0 ){
+        printf("Receive client destroy request!\n");
+        return "end";
+    }
     return ptr;
 }
 
