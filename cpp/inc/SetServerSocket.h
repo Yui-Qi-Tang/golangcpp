@@ -5,10 +5,12 @@
 
 #include <stdio.h> // just for printf
 
+// #include <sys/poll.h>
+
 
 class SetServerSocket {
     public:
-        SetServerSocket(char * ip, int port);
+        SetServerSocket(const char *ip, int port);
         ~SetServerSocket();
 
         void start_server();
@@ -22,8 +24,18 @@ class SetServerSocket {
         int create_client_fd();
         bool client_connect(int client_fd);
         bool client_send_msg(int client_fd, char *msg);
+        
+        bool server_send_msg(int guest_fd, char *msg);
+
+        const char* get_client_msg(int guest_fd);
+
+        void process_msg(int guest_fd, const char *msg);
+
+        size_t len(const char *msg);
+
+        void close_guest_fd(int guest_fd);
 
     private:
-        char *_ip;
+        const char *_ip;
         int _port;    
 };

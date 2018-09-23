@@ -1,7 +1,7 @@
 #include "SetServerSocket.h"
 
 /* 建構子 */
-SetServerSocket::SetServerSocket(char *ip, int port) {
+SetServerSocket::SetServerSocket(const char *ip, int port) {
     _ip = ip;
     _port = port;   
 }
@@ -14,18 +14,35 @@ SetServerSocket::~SetServerSocket() {
 /* 開啟socket server */
 void SetServerSocket::start_server() {
     int server_fd = socket_listen();
-
+    printf("Server starting...\n");
     while(0x1) {
         int new_fd = -1;
+        printf("===>Waitting for new client...\n");
         new_fd = new_guest_fd(server_fd);
         if(new_fd < 0){
-			printf("accept new guest failed!!");
+			printf("accept new guest failed!!\n");
 			continue;
 		}
-        printf("New guest!!\n");
+        printf("New guest, the fd is: * %d *!!\n", new_fd);
 
-        showRecvMsg(new_fd);
+        /*
+        const char *STOP = "stop";
+        const char *guest_str = get_client_msg(new_fd);
+        printf("guest say: %s\n", guest_str);
+        if(strcmp(guest_str, STOP) == 0){
+          close(new_fd);
+        }
+        */
 
+        
+        process_msg(new_fd, get_client_msg(new_fd));
+        printf("Wait client close!!\n");
+        if(get_client_msg(new_fd) == "end"){ // enter to recv loop again
+           close_guest_fd(new_fd);
+        }
+        //for(int i = 0; i < 4; i++){
+        //    printf("%d: recv str %s\n",i , get_client_msg(new_fd));
+        //}
     }
 
 }
@@ -71,9 +88,18 @@ void SetServerSocket::showRecvMsg(int guest_fd) {
     printf("Check recv\n");
     const int MAX_MSG_BUF_SIZE = 8192;
 	char buf[MAX_MSG_BUF_SIZE];
+    // char* buf;
+    memset(buf, 0, sizeof(buf)); // init client; windows env doesnot support this function
+
+    printf("Size of buf is %lu\n", sizeof(buf)); // long unsigned int sizeof()
 	int has_new_msg = recv(guest_fd, buf, sizeof(buf), 0);
+    int len = 0;
+    while(buf[len] != '\0') {
+        len++;
+    }
+    printf("buf data counts: %d\n", len);
 	if (has_new_msg > 0) {
-		printf("Server get guest msg: %s\n", buf);
+		printf("Server get guest %d msg: %s\n", guest_fd, buf);
 	}
 	else {
 		printf("recv failed!\n");
@@ -131,4 +157,62 @@ bool SetServerSocket::client_send_msg(int client_fd, char *msg) {
     else {
         return true;
     }
+}
+
+/* server send msg to client */
+bool SetServerSocket::server_send_msg(int guest_fd, char *msg) {
+    int success = send(guest_fd, msg, strlen(msg), 0);
+    if (success < 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+/* return msg from client */
+const char* SetServerSocket::get_client_msg(int guest_fd) {
+    const int MAX_MSG_BUF_SIZE = 8192;
+	char buf[MAX_MSG_BUF_SIZE];
+    const char *ptr = buf;
+    memset(buf, 0, sizeof(buf)); // init client; windows env doesnot support this function
+	int has_new_msg = recv(guest_fd, buf, sizeof(buf), 0);
+
+    //printf("revc: %d\n", has_new_msg);
+    if(has_new_msg <= 0 ){
+        printf("Receive client destroy request!\n");
+        return "end";
+    }
+    return ptr;
+}
+
+/* process msg from client */
+void SetServerSocket::process_msg(int guest_fd, const char *msg) {
+    printf("get msg from client: %s\n", msg);
+    const char *QUIT = "quit";
+    const char *BYE = "release";
+    const char *HELLO = "Hello!";
+    if(strcmp(msg, QUIT) == 0 ) {
+        send(guest_fd, BYE, len(BYE), 0);
+        close_guest_fd(guest_fd);
+    }
+    else {
+        send(guest_fd, HELLO, len(HELLO), 0);
+    }
+}
+
+/* get const char* size */
+size_t SetServerSocket::len(const char *msg) {
+    size_t size = 0;
+    char NULL_CHAR = '\0';
+    while(*(msg+size) != NULL_CHAR) {
+        size++;
+    }
+    return size;
+}
+
+/* close guest fd */
+void SetServerSocket::close_guest_fd(int guest_fd) {
+    printf("Close guest fd: %d...\n", guest_fd);
+    close(guest_fd);
 }
