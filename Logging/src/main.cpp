@@ -1,7 +1,7 @@
 #include "Logging.h"
 
 int main() {
-    const char *logFilePath = "./logFile";
+    const char *logFilePath = "./logFile.log";
     Logging logger;
     if(!logger.loggingStart(logFilePath)) {
         printf("Start logger failed!");
